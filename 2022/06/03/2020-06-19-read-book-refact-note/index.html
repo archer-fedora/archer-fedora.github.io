@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="重构代码读书笔记一. 概述接触这些坏代码可以分为三类：  代码坏味道导致代码臃肿： 代码坏味道导致修改演进困难； 代码的坏味道之c++；  重点总结c语言相关的坏味道 二. 坏味道识别1. 代码坏味道导致代码臃肿：01 重复代码简单的复制&#x2F;粘贴，或者无意间添加了相同逻辑的代码都是有可能的导致重复代码出现的。 见gui.py 那么为什么重复的代码是一种坏味道？ 最明显的就是重复的代码容易造成修改时的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="重构代码读书笔记">
+<meta property="og:url" content="http://example.com/2022/06/03/2020-06-19-read-book-refact-note/index.html">
+<meta property="og:site_name" content="懒懒的">
+<meta property="og:description" content="重构代码读书笔记一. 概述接触这些坏代码可以分为三类：  代码坏味道导致代码臃肿： 代码坏味道导致修改演进困难； 代码的坏味道之c++；  重点总结c语言相关的坏味道 二. 坏味道识别1. 代码坏味道导致代码臃肿：01 重复代码简单的复制&#x2F;粘贴，或者无意间添加了相同逻辑的代码都是有可能的导致重复代码出现的。 见gui.py 那么为什么重复的代码是一种坏味道？ 最明显的就是重复的代码容易造成修改时的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-03T09:23:57.643Z">
+<meta property="article:modified_time" content="2022-06-03T12:31:58.251Z">
+<meta property="article:author" content="Archer F">
+<meta property="article:tag" content="leetcode">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>重构代码读书笔记</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/06/03/2020-11-21-leetcode-kuaileshu/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/06/03/2020-02-11-Mac-Brew-Install/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&text=重构代码读书笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&is_video=false&description=重构代码读书笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=重构代码读书笔记&body=Check out this article: http://example.com/2022/06/03/2020-06-19-read-book-refact-note/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&name=重构代码读书笔记&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&t=重构代码读书笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%87%8D%E6%9E%84%E4%BB%A3%E7%A0%81%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">重构代码读书笔记</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E6%A6%82%E8%BF%B0"><span class="toc-number">2.</span> <span class="toc-text">一. 概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-%E5%9D%8F%E5%91%B3%E9%81%93%E8%AF%86%E5%88%AB"><span class="toc-number">3.</span> <span class="toc-text">二. 坏味道识别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%A3%E7%A0%81%E5%9D%8F%E5%91%B3%E9%81%93%E5%AF%BC%E8%87%B4%E4%BB%A3%E7%A0%81%E8%87%83%E8%82%BF%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">1. 代码坏味道导致代码臃肿：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#01-%E9%87%8D%E5%A4%8D%E4%BB%A3%E7%A0%81"><span class="toc-number">3.1.1.</span> <span class="toc-text">01 重复代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#02-%E9%95%BF%E5%87%BD%E6%95%B0"><span class="toc-number">3.1.2.</span> <span class="toc-text">02 长函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#04-%E8%BF%87%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8"><span class="toc-number">3.1.3.</span> <span class="toc-text">04 过长参数列表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#05-Switch-%E8%AF%AD%E5%8F%A5"><span class="toc-number">3.1.4.</span> <span class="toc-text">05 Switch 语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#06-%E5%A4%B8%E5%A4%B8%E5%85%B6%E8%B0%88%E7%9A%84%E6%9C%AA%E6%9D%A5%E6%80%A7"><span class="toc-number">3.1.5.</span> <span class="toc-text">06 夸夸其谈的未来性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#07-%E4%BB%A4%E4%BA%BA%E8%BF%B7%E6%83%91%E7%9A%84%E4%B8%B4%E6%97%B6%E5%AD%97%E6%AE%B5"><span class="toc-number">3.1.6.</span> <span class="toc-text">07 令人迷惑的临时字段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#08-%E8%BF%87%E5%A4%9A%E7%9A%84%E6%B3%A8%E9%87%8A"><span class="toc-number">3.1.7.</span> <span class="toc-text">08 过多的注释</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%A3%E7%A0%81%E5%9D%8F%E5%91%B3%E9%81%93%E5%AF%BC%E8%87%B4%E4%BF%AE%E6%94%B9%E6%BC%94%E8%BF%9B%E5%9B%B0%E9%9A%BE"><span class="toc-number">3.2.</span> <span class="toc-text">2. 代码坏味道导致修改演进困难</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#01-%E5%8F%91%E6%95%A3%E5%BC%8F%E5%8F%98%E5%8C%96"><span class="toc-number">3.2.1.</span> <span class="toc-text">01 发散式变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#02-%E9%9C%B0%E5%BC%B9%E5%BC%8F%E4%BF%AE%E6%94%B9"><span class="toc-number">3.2.2.</span> <span class="toc-text">02 霰弹式修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#03-%E4%BE%9D%E6%81%8B%E6%83%85%E7%BB%93"><span class="toc-number">3.2.3.</span> <span class="toc-text">03 依恋情结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#04-%E6%95%B0%E6%8D%AE%E6%B3%A5%E7%90%83"><span class="toc-number">3.2.4.</span> <span class="toc-text">04 数据泥球</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#05-%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E5%81%8F%E6%89%A7"><span class="toc-number">3.2.5.</span> <span class="toc-text">05 基本类型偏执</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#06-%E8%BF%87%E5%BA%A6%E8%80%A6%E5%90%88%E7%9A%84%E6%B6%88%E6%81%AF%E9%93%BE"><span class="toc-number">3.2.6.</span> <span class="toc-text">06 过度耦合的消息链</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BB%A3%E7%A0%81%E7%9A%84%E5%9D%8F%E5%91%B3%E9%81%93%E4%B9%8Bc"><span class="toc-number">3.3.</span> <span class="toc-text">3. 代码的坏味道之c++</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#01-%E4%B8%AD%E9%97%B4%E4%BA%BA%EF%BC%88Middle-Man%EF%BC%89"><span class="toc-number">3.3.1.</span> <span class="toc-text">01 中间人（Middle Man）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#02-%E7%8B%8E%E6%98%B5%E5%85%B3%E7%B3%BB%EF%BC%88Inappropriate-Intimacy%EF%BC%89"><span class="toc-number">3.3.2.</span> <span class="toc-text">02 狎昵关系（Inappropriate Intimacy）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#03-%E4%B8%8D%E5%AE%8C%E7%BE%8E%E7%9A%84%E5%BA%93%E7%B1%BB"><span class="toc-number">3.3.3.</span> <span class="toc-text">03 不完美的库类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#04-%E6%8B%92%E7%BB%9D%E7%9A%84%E9%81%97%E8%B5%A0"><span class="toc-number">3.3.4.</span> <span class="toc-text">04 拒绝的遗赠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#05-%E5%86%97%E8%B5%98%E7%B1%BB%EF%BC%88Lacy-Class%EF%BC%89"><span class="toc-number">3.3.5.</span> <span class="toc-text">05 冗赘类（Lacy Class）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#06-%E5%BC%82%E6%9B%B2%E5%90%8C%E5%B7%A5%E7%9A%84%E7%B1%BB"><span class="toc-number">3.3.6.</span> <span class="toc-text">06 异曲同工的类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#07-%E7%BA%AF%E6%95%B0%E6%8D%AE%E7%B1%BB"><span class="toc-number">3.3.7.</span> <span class="toc-text">07 纯数据类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#08-%E8%BF%87%E5%A4%A7%E7%9A%84%E7%B1%BB"><span class="toc-number">3.3.8.</span> <span class="toc-text">08 过大的类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-%E5%85%B6%E4%BB%96%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">三. 其他：</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        重构代码读书笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Archer F</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-06-03T09:23:57.643Z" itemprop="datePublished">2022-06-03</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/book/">book</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/leetcode/" rel="tag">leetcode</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id="重构代码读书笔记"><a href="#重构代码读书笔记" class="headerlink" title="重构代码读书笔记"></a>重构代码读书笔记</h1><h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一. 概述"></a>一. 概述</h1><p>接触这些坏代码可以分为三类：</p>
+<ol>
+<li>代码坏味道导致代码臃肿：</li>
+<li>代码坏味道导致修改演进困难；</li>
+<li>代码的坏味道之c++；</li>
+</ol>
+<p>重点总结c语言相关的坏味道</p>
+<h1 id="二-坏味道识别"><a href="#二-坏味道识别" class="headerlink" title="二. 坏味道识别"></a>二. 坏味道识别</h1><h2 id="1-代码坏味道导致代码臃肿："><a href="#1-代码坏味道导致代码臃肿：" class="headerlink" title="1. 代码坏味道导致代码臃肿："></a>1. 代码坏味道导致代码臃肿：</h2><h3 id="01-重复代码"><a href="#01-重复代码" class="headerlink" title="01 重复代码"></a>01 重复代码</h3><p>简单的复制/粘贴，或者无意间添加了相同逻辑的代码都是有可能的导致重复代码出现的。</p>
+<p><code>见gui.py</code></p>
+<p><strong>那么为什么重复的代码是一种坏味道？</strong></p>
+<p>最明显的就是重复的代码容易造成修改时的遗漏，修改遗漏导致一个问题需要修改多次才能才能确定最终修改完成。如果有一部分修改了，另外一部分没有修改且没有被发现，日后再遇到感觉类似，实则不同的代码会花费大量的时间确定业务上的需求，实现上应该如何处理。</p>
+<p>重复代码这类坏味道产生的成本很低，但是带来的影响却是很大。</p>
+<p><strong>如何解决重复代码问题？</strong></p>
+<ol>
+<li>Simple Design 为我们提供了参考参考原则：“通过测试，揭示意图，消除重复，最少元素”。</li>
+<li>如果重复代码发生在一个类中，且两段代码完全重复，可以借助 Extract Method （提炼函数）这个重构手法来消除重复；提炼函数时 IDE 一般都会自动提示是否同时修改重复的代码，减少重构的工作量。</li>
+<li>如果重复代码发生在一个类中，且两段代码之后部分重复。那么可以将部分重复的代码通过 Extract Method 的手法，提炼到单独的方法中，并替换掉部分重复的代码。</li>
+<li>如果重复的代码在不同的类中，且这些类是兄弟类，可以使用 Pull Up Method，将重复的代码提炼到父类，并让原本的类继承父类。</li>
+<li>如果重复的代码在不同的类中，且这些类之间关联性不大，那么可以 Extract Class，将重复的挪动到一个新的类中，原本出现重复的地方来调用这个新产生的类的方法。</li>
+<li>消除重复之后，检测代码表达的意图是否准确、完成，Extract Method 时可以通过良好的方法名来解释提炼的函数的作用和意图。</li>
+</ol>
+<h3 id="02-长函数"><a href="#02-长函数" class="headerlink" title="02 长函数"></a>02 长函数</h3><p>顾名思义，长度过长的函数。其中包括两种情况，横向过长，纵向过长。</p>
+<p><strong>为什么长函数是一种坏味道？</strong></p>
+<p>横向过长时，往往一眼无法快速了解该行代码要表达的意思和中间的过程。当出现 Bug 定位问题时也不容易一次性定位到问题所在。</p>
+<p>纵向过长时，往往会感觉某个函数内部逻辑复杂、晦涩难懂。修改代码中也会因为无法照顾到要修改的方法中的其他行代码，而顾此失彼，最终导致难度难修改。经过多次修改后甚至原有的基本结构都会遭到破坏，导致后续修改难度逐渐增加。</p>
+<p><strong>如何解决长函数的问题？</strong></p>
+<ol>
+<li>横向过长的代码，可以通过代码格式化、CheckStyle插件来发现和消除。比如，Lambda 表达式，可以选择在出现第一个“.”时就就开始换行。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Node&gt; nodes = items.stream().filter(Item::isFree).filter(Item::notWork).map(Formater::format).filter(Node::hadChildren).filter(Node::hadMarked).collection(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<p>这行代码我们需要仔细读 才能清楚中间的过程。采用首个“.”出现换行的将会是如下格式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Node&gt; nodes = items</span><br><span class="line">  .stream()</span><br><span class="line">  .filter(Item::isFree)</span><br><span class="line">  .filter(Item::notWork)</span><br><span class="line">  .map(Formater::format)</span><br><span class="line">  .filter(Node::hadChildren)</span><br><span class="line">  .filter(Node::hadMarked)</span><br><span class="line">  .collection(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<p>通过对横向代码格式化能够为代码带来更好的可读性。当然你可以在提交代码到仓库时勾选上 commit 时自动格式化代码的选项，避免没有 Check Style 等工具来守护代码，遗漏掉格式问题。</p>
+<ol>
+<li>纵向过长的代码。往往多个实现细节堆叠在一个方法中造成的，这种情况下使用 Inline Temp（内联局部变量）、 Extract Method 的重构手法来提炼小的函数。一个类中有很多零散的小函数也是常见的，因此提炼函数的同时记住，提炼函数的也是也是考虑创建新的类时候，将不同作用的函数提炼到响应职责的类中。</li>
+<li>纵向过长的代码，往往存在职责不够单一的情况，保持方法职责的单一有助于维护代码的可读性。通过 2 中 提到的 Extract Method，那么某个具体实现细节可以被提炼到一个小函数中，而原来的函数则职责就编程调度作用。所以方法的单一职责，更清晰的描述应该是一类事情，要么只在处理实现细节，要么处理调度协调代码调用。</li>
+</ol>
+<h3 id="04-过长参数列表"><a href="#04-过长参数列表" class="headerlink" title="04 过长参数列表"></a>04 过长参数列表</h3><p>当方法的参数列表过长时这也是一种代码的坏味道。</p>
+<p><strong>为什么参数过长是一种坏味道？</strong></p>
+<p>参数过长和过大的类、过长的函数、重复代码一样，起初并不会导致什么错误，但是代码随着时间向前演变过程，会给代码带来很多麻烦。</p>
+<p>长参数函数的可读性很差，尤其是存在多个类似长参数方法时，并不容易判断出应该使用哪个方法。</p>
+<p>当需要为长参数函数添加新的参数时，将会促使调用方发生变化，且新参数的位置也将让这个方法更加难以理解。</p>
+<p><strong>如何解决长参数的代码坏味道？</strong></p>
+<ol>
+<li>如果传递的几个参数都出自一个对象，那么可以选择使用 Preserve Whole Object（保持完整对象）直接传递该对象。</li>
+<li>如果方法的参数来自不同的对象，可以选择使用 Introduce Parameter Object（引入参数对象）将多个参数放入一个新的类中，原来方法传递多个分开的参数，现在传递一个包含多个属性的一个对象。</li>
+<li>如果调用者先计算调用 A 方法得到计算结果，然后将计算结果在传递给这个长参数函数，那么可以考虑去除这个参数，改为在长参数函数中直接调用 A 得到结果，从而消除传递的部分参数，这个重构过程可以参考 Replace Parameter With Method（使函数替换参数）。</li>
+</ol>
+<p>需要的注意的是，有些情况下长参数的存在也是合理的，因为在一定程度上可以避免某些依赖关系的产生。可以通过观察长参数函数变化的频率，并采用“事不过三，三则重构“的原则，保持进行重构的准备。</p>
+<h3 id="05-Switch-语句"><a href="#05-Switch-语句" class="headerlink" title="05 Switch 语句"></a>05 Switch 语句</h3><p>Switch 语句代表一类语句，比如 if…else, switch… case 语句都是 switch 语句。</p>
+<p><strong>为什么 Switch 语句是一种代码坏味道？</strong></p>
+<p>首先并不是所有的 Switch 语句都是坏味道，Swith 语句开发中常见的语句。这里带有坏味道的 Switch 语句指的是那些造成重复代码的 Switch语句。例如：根据某个状态来判断执行执行哪个动作。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static int getServiceCode(String str)&#123;</span><br><span class="line">     int code = 0;</span><br><span class="line">     if(str.equals(&quot;Age&quot;))&#123;</span><br><span class="line">         code = 1;</span><br><span class="line">     &#125;else if(str.equals(&quot;Address&quot;))&#123;</span><br><span class="line">         code = 2;</span><br><span class="line">     &#125;else  if(str.equals(&quot;Name&quot;))&#123;</span><br><span class="line">         code = 3;</span><br><span class="line">     &#125;else if(str.equals(&quot;No&quot;))&#123;</span><br><span class="line">         code = 4;</span><br><span class="line">     &#125;</span><br><span class="line">     return  code;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">`public static void initialMap()&#123;</span><br><span class="line">   map.put(&quot;Age&quot;,1);`</span><br><span class="line">     `map.put(&quot;Address&quot;,2);`</span><br><span class="line">     `map.put(&quot;Name&quot;,3);`</span><br><span class="line">     `map.put(&quot;No&quot;,4);`</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种实现方法很多代码中都会出现，但是多数人使用这种方式添加代码，并不意味着这是一种好的代码。这样的实现方式很容易造成长函数，而且每次修改的位置要非常精准，需要在多个条件中逐个遍历找到最终需要的那个，再修改，可读性上无疑也是很差的。</p>
+<p>如何处理 Switch 语句这种代码坏味道呢？**</p>
+<ol>
+<li>如果 swtich 语句是某个方法的一部分，那么不妨使用 Extract Method（提炼函数）将其先提炼出一个单独的方法，缩小上下文范围。</li>
+<li>观察多个条件中的动作的关联关系，是否符合多态，如果是将符合多态的几个条件创建对应的类，并使用 Move Method （移动函数）移动到新创建的类中。</li>
+<li>使用状态模式、枚举等多种实现手段消除其中的 swtich 语句。</li>
+</ol>
+<p>如果对有限状态机感兴趣可以参考文章：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/97442825">《Java有限状态机的4种实现对比》</a></p>
+<p>总而言之，一旦打算通过叠加新的 swtich case 来添加新逻辑，那么就应该关注一下代码设计，因为这种操作很有可能就是为后续的代码在挖坑。同时理解清楚那些swtich 语句是具有坏味道的语句。</p>
+<h3 id="06-夸夸其谈的未来性"><a href="#06-夸夸其谈的未来性" class="headerlink" title="06 夸夸其谈的未来性"></a>06 夸夸其谈的未来性</h3><p>这是工作中最常见的一类问题，比如如果你听到这句话“我将文件上传的实现做了调整 … 未来再使用的时候将会 …”就应该警觉起来。</p>
+<p><strong>为什么夸夸其谈的未来型是一种代码坏味道？</strong></p>
+<p>未来意味着当下并不是必须的，过度的抽象和提升复杂性也会让系统难以理解和维护，同时也容易分散团队的注意力，如果用不到，那么就不值得做。</p>
+<p>除非你在进行假设驱动开发，否则代码上总是谈未来容易绑架团队的思想，拿未来不确定的事情来解释事情的合理，会让那些务实者，关注投入产出比的抉择。并且容易让团队进入一个假象。</p>
+<p>当业务上变动时，并不能及时的将代码进行变动，因为原来的代码中包含了一种对未来假设的实现，无形中增加了代码的复杂度，而且很容易增加团队沟通成本。</p>
+<p><strong>如何解决夸夸其谈的未来性的代码坏味道？</strong></p>
+<p>Simple Design （简单设计原则）能够帮助我们作出抉择。当实现业务代码时考虑”通过测试、揭示意图、消除重复、最少元素“。</p>
+<p>当发现为未来而写的代码时，可以：</p>
+<ol>
+<li>删除那些觉的未来有用的参数、代码、方法调用。</li>
+<li>修正方法名，使方法名揭示当下业务场景的意图，避免抽象的技术描述词。</li>
+</ol>
+<p>通过上面两个过程将代码原本的要表达的意思还原回来。</p>
+<p>工作中有两类未来性。一类是假设调用方可以怎么使用；一类是未来必然发生的业务功能。代码的坏味道更多的指的是第一种情况，第二种情况可以开发之前体现进行简单设计和拆分，从而避免过度设计，同时可以避免谈未来性，来让代码随着功能一起小步重构并演进。</p>
+<h3 id="07-令人迷惑的临时字段"><a href="#07-令人迷惑的临时字段" class="headerlink" title="07 令人迷惑的临时字段"></a>07 令人迷惑的临时字段</h3><p>在一些场景下为了在实现上的临时方便性，有的开发者会直接在某个对象上添加一个属性，后续使用在需要的时候使用该属性。</p>
+<p><strong>令人迷惑的临时字段的是什么代码坏味道？</strong></p>
+<p>一个类包含属性和方法，属性都是该类相关的。而临时向类中添加的字段，虽然临时有关联性，但是单独来看这个类中的属性时，却会让人觉得非常费解。有些接口的返回值就是也是类似原因导致的结果，每次为了方便像类中直接添加一些临时属性，满足了当时的需要，但是后续再使用的时候却并不能区分哪些属性时必须的，哪些是不必须的，以及哪些被添加的字段的上下文分别是什么。</p>
+<p><strong>如何解决令人迷惑的临时字段？</strong></p>
+<ol>
+<li>问题的原因是随意向类上添加字段，解决的方法就是将这个临时字段移走，可以为这个字段找到一个合适的类来存放，也可以使用 Extract Class （提炼类）将这个字段添加到一个新类中，然后将该字段的相关的逻辑移动到该类中，并确定该类的职责。</li>
+<li>可以将临时字段作为参数进行传递，但是为了避免过长参数的出现，可以选择将临时字段提炼到一个新的类中。</li>
+</ol>
+<p>举例：</p>
+<p>将一个表达式提取为一个单独的函数，新函数可以被其它函数调用。之中有一段实例代码，用python改写如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def calc_price(self):</span><br><span class="line">	base_price = self._quality * self._item_price</span><br><span class="line">	if base_price &gt; 1000:</span><br><span class="line">		return base_price * 0.95</span><br><span class="line">	else:</span><br><span class="line">		return base_price * 0.98</span><br></pre></td></tr></table></figure>
+
+<p>重构后是这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def calc_price(self):</span><br><span class="line">	if self.base_price() &gt; 1000:</span><br><span class="line">		return self.base_price() * 0.95</span><br><span class="line">	else:</span><br><span class="line">		return self.base_price() * 0.98</span><br><span class="line"></span><br><span class="line">def base_price(self):</span><br><span class="line">	return self._quality * self._item_price</span><br><span class="line">	</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="08-过多的注释"><a href="#08-过多的注释" class="headerlink" title="08 过多的注释"></a>08 过多的注释</h3><p>这是注释降低代码可读性，甚至误导了代码要要表达的意图。</p>
+<p><strong>为什么过多的注释是一种代码坏味道？</strong></p>
+<p>首先并不是所有的注视都是坏味道。</p>
+<p>如果想通过注释来表达代码的意思，那么代码修改了注释也需要同步进行修改，如果代码修改了但是没有修正这是注释就有可能导致误导。</p>
+<p>还有一种注释的坏味道，指的是不使用的代码通过注释掉来表示其弃用。后续代码的阅读者会经常收到断断续续的注释掉的代码影响。降低读代码和改代码的速度。</p>
+<p>在 《Clean Code》 中罗列了一些注释的坏味道：</p>
+<ol>
+<li>喃喃自语</li>
+<li>多余的注释</li>
+<li>误导性注释</li>
+<li>循规方注释</li>
+<li>日志式注释</li>
+<li>废话注释</li>
+<li>用注释来解释变量意思</li>
+<li>用来标记位置的注释</li>
+<li>类的归属的注释</li>
+<li>注释掉的代码<br>…</li>
+</ol>
+<h2 id="2-代码坏味道导致修改演进困难"><a href="#2-代码坏味道导致修改演进困难" class="headerlink" title="2. 代码坏味道导致修改演进困难"></a>2. 代码坏味道导致修改演进困难</h2><h3 id="01-发散式变化"><a href="#01-发散式变化" class="headerlink" title="01 发散式变化"></a>01 发散式变化</h3><p>简而言之就是一个类总是因为不同类型的原因发生变化。例如：需要修改数据源时要修改该类，需要修改缓存时还需要修改这个类，甚至当修改某个策略的计算公式时还会牵连到这个类。这种总是/经常因为不同类型原因导致一个类发生变化的代码就是指的发散式变化。</p>
+<p><strong>为什么发散式变化是代码坏味道？</strong></p>
+<p>由于总是不同的原因导致一个类发生变化，意味着一个类中存在多种类型的行为（例如即操作订单，又操作合同，还操作零件信息等），大而全的类会导致下面两方面的问题：</p>
+<ol>
+<li>降低了代码可读性，存在不同上下问题的切换；</li>
+<li>很可能导致无法快速响应变化。大而复杂类，在修改和维护的时候，并不容易做出决策，同时单个原因的修改很可能导致一个原因修改导致和非相关的业务代码发生变动。</li>
+<li>随着代码的增加，代码的复杂性肯定是增加的，而发散式变化如果不被关注，很容易导致后续代码修改时类变成难以修改的大泥球。</li>
+</ol>
+<p>发散式变化很容易导致另外一个坏味道出现，就是“过大的类”。</p>
+<p><strong>如何解决发散式变化这种坏味道？</strong></p>
+<p>单一职责原则可以用来解决发散式变化、过大的类的坏味道的指导原则：一个类只有一个引起其变化的原因。既然由于一个类存在过类行为，可以通过 Extract Class 来将不同的方法提炼到不同职责的类中。</p>
+<p>发散式变化虽然很简单，但是却是很容易遇到的一种坏味道。因为刚开始添加的代码的很可能体会不到一个存在多类行为的坏处。只有当类发生变化或者修改的时候才会逐渐这种大而全的实现的缺点。</p>
+<h3 id="02-霰弹式修改"><a href="#02-霰弹式修改" class="headerlink" title="02 霰弹式修改"></a>02 霰弹式修改</h3><p>当一个类进行了修改会导致很多其他类也需要相应进行修改，我们称为“霰弹式修改”。</p>
+<p><strong>为什么霰弹式修改是一种坏味道？</strong></p>
+<ol>
+<li>当出现霰弹式修改的时候，容易造成修改上的遗漏，因此需要多次编译、运行测试、测试功能才有可能完全修改，虽然有的问题编译的时候就可以发现已经很快了，但是反复的编译本来也是不断花费时间的，久而久之也是一种重复低效的。</li>
+<li>不难发现一个类的变化导致其他类相应的变化，这是一种强耦合的表现。</li>
+</ol>
+<p><strong>如何解决霰弹式修改这种坏味道？</strong></p>
+<p>既然霰弹式修改是一种耦合性的表现，我们可以将相关的代码通过 Move Field （移动属性）和 Move Method （移动方法）两种重构手段将代码移动到一个类中。这样做的好处是让变化的内容聚集到了，有助于简化后续的修改。</p>
+<p>如果因为上面的操作类中添加了某些方法导致一个类有了多个职责，那么可以在进一步通过 Extract Method（提炼函数）来拆分职责。</p>
+<p>也可以创建代理类或者方法重载来来解决特定的霰弹式修改导致的问题。</p>
+<h3 id="03-依恋情结"><a href="#03-依恋情结" class="headerlink" title="03 依恋情结"></a>03 依恋情结</h3><p>刚开始接触代码中的坏味道时，乍一看你可能会觉得有些费解。其实它描述的问题却是很简单的，就是：一个类多次调用另外一个类的方法来获取最终的结果。如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderService</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> List&lt;Order&gt; <span class="title function_">findAllOrders</span><span class="params">()</span> &#123;</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Order <span class="title function_">findLatestOrder</span><span class="params">(List&lt;Order&gt; orders)</span> &#123;</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Order <span class="title function_">addProduct</span><span class="params">(Order order, Product product)</span> &#123;</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CartService</span> &#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addProduct</span><span class="params">(Product product)</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        List&lt;Orders&gt; orders = orderService.findAllOrders();</span><br><span class="line">        <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderService.findLatestOrder(orders);</span><br><span class="line">        order = orderService.addProduct(product);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再是不用考虑上面这段的代码业务上的合理性。代码中 CartService 中多次调用 OrderService 的方法，其目的就是执行最后的 addProduct() 方法，这就是一种依恋情结的代码。</p>
+<p><strong>为什么依恋情结是代码坏味道？</strong></p>
+<ol>
+<li>仔细观察 CartService.addProduct() 方法不难发现那三行的代码的意图就是将 product 添加到最新的 order 中，如何实现将 product 添加到 product 这个目的，上面带代码显然展示了一种策略的具体实现。显然这种实现使得方法的职责不再单一。</li>
+<li>另外一个问题是，当 OrderService中的 findAllOrders()、findLatestOrder()、addProduct() 方法因为需求发生变动的时候，都有可能会牵连到 CartService 中的代码发生变化。因此上面中代码通过强耦合性虽然实现了功能，但是应对变化的能力也随之降低。代码是不断演进的，忽略了这种坏味道，会导致后续变化付出相应的代价。</li>
+</ol>
+<p><strong>如何解决依恋情结这种代码坏味道？</strong></p>
+<p>如果你看过上一篇内容或者看过上面前两个坏味道，那么应该也有一些思路了，如果一类在一个方法中多次依赖另外一个类，我们可以立即为有可能是职责没有划分划分明确的原因，可以通过一下手段进行重构：</p>
+<ol>
+<li>将多次产生调用的几行代码使用 Extract Method（提炼函数）提炼为一个新的函数，并通过名称来解释这几个行代码所要表达的意思。</li>
+<li>接下来可以使用 Move Method （搬移函数）将刚刚提炼的函数放置到一个更合适的类中，可以是刚刚被调用的类中，也可以创建新的类。</li>
+</ol>
+<p>通过上面简单两步，我们可以将后续变化影响的范围变小，OrderService 内的变化将不再容易牵连到 CartService。</p>
+<h3 id="04-数据泥球"><a href="#04-数据泥球" class="headerlink" title="04 数据泥球"></a>04 数据泥球</h3><p>数据泥球指的是：多个类/方法参数中都有相同的属性，且这些相同的属性的业务意义也是相同的。</p>
+<p><strong>为什么数据泥球是代码坏味道？</strong></p>
+<p>很显然这是一种重复的表现。数据泥球容易造成如下问题：</p>
+<ol>
+<li>涉及到属性的调整，容易造成遗漏，需要多次调整。</li>
+<li>降低阅读代码的效率，因为每次都需要从类中识别出有几个属性是相关的在表达一个意思。</li>
+<li>随着代码的增加容易导致多大的类、长函数等多种坏味道。</li>
+</ol>
+<p><strong>如何解决数据泥球这种代码坏味道？</strong></p>
+<ol>
+<li>如果类中的字段出现了数据泥球，对于这些重复的字段可以使用 Extract Class（ 提炼类） 将关联几个属性提炼到一个类中，赋予它一个业务的概念。</li>
+<li>如果是多个方法参数中出现了多个重复的多个参数，可以通过 Introduce Parameter Object（引入参数对象）将多个参数使用对象来代替，从而有效的减少重复和参数个数。</li>
+<li>其中 2 的另外一种情况，如何调用者先通过一些逻辑生成几个变量，再将这几个变量通过参数传递给调用的方法，那么可以使用 Presere Whole Object（保持对象完整），将变量生成提炼到一个函数中，并并取消参数的传递，而是在被调用的方法中直接调用原本要传递的参数。</li>
+</ol>
+<h3 id="05-基本类型偏执"><a href="#05-基本类型偏执" class="headerlink" title="05 基本类型偏执"></a>05 基本类型偏执</h3><p>描述的是这样一种代码实现方式：经常使用基本数据类型，而不愿意使用对象将这些基本数据类型和其行为进行封装。</p>
+<p><strong>为什么基本类型偏执是代码坏味道？</strong></p>
+<p>首先基本类型有其作用。问题出现在不做场景区分场景，所有场景都是用基本数据类型去搭建业务逻辑。</p>
+<p>问题往往出现在这种场景：</p>
+<blockquote>
+<p>几个基本数据类型共同表达意思概念，但是实现方式却是像搭积木一样，将逻辑一步步的拼接搭建起来，最终得到期望的结果。</p>
+</blockquote>
+<p>这种实现的方式的问题就在于日后阅读代码的时候每次阅读都需要从头到位梳理一遍，才能清楚的其表达的意思，时间消耗有的是几秒钟，有的是几分钟，但是堆积读几次将会累积消耗更多的阅读时间。问题就出现在不够直白的揭示意图。</p>
+<blockquote>
+<p>使用几个基本数据类型表示不同的类型，即所谓的 Type Code。</p>
+</blockquote>
+<p>这种代码也是存在可读性的问题，而且非常容易导致 switch 语句的坏味道。</p>
+<p>因此，并不是不能使用基本数据类型，而是应该在揭示某个业务意图的时候适当的使用封装，将多个基本数据类型封装到一个类中。从而通过对象直白的表达意图。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">* a 存款</span><br><span class="line">* b 收入</span><br><span class="line">**/</span><br><span class="line">public getSum(int a，int b)&#123;</span><br><span class="line">    return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class Money&#123;</span><br><span class="line"></span><br><span class="line">    public int value;//货币面值</span><br><span class="line">    public String name;//货币名称</span><br><span class="line">    public float rate; //汇率</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public getSum(Money a,Money b)&#123;</span><br><span class="line">  return a.value*a.rate+b.value*b.rate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="06-过度耦合的消息链"><a href="#06-过度耦合的消息链" class="headerlink" title="06 过度耦合的消息链"></a>06 过度耦合的消息链</h3><p>这种代码味道值得是不断从获取到的对象的子对象，导致很长的调用链。</p>
+<p>例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">private</span> Address address;</span><br><span class="line">        ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Address</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">private</span> City city;</span><br><span class="line">        ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">City</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">private</span> PostCode postCode;</span><br><span class="line">        ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PostCode</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">private</span> String code;</span><br><span class="line">        ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>多度耦合的消息链代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">postCode</span> <span class="operator">=</span> user.getAddress()</span><br><span class="line">                                            .getCity()</span><br><span class="line">                                            .getPostCode()</span><br><span class="line">                                            .getCode();</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么过度耦合的消息链是一种代码坏味道？</strong></p>
+<ol>
+<li>上面的实现虽然能够正常运行，但是会导致类之间的耦合，即 User 类的调用者需要在自己的内部来获得没有直接练习的 postCode 的实现；</li>
+<li>降低了可读性。将整个消息链读完之后才能知道得到了什么，而这个过程的很多很多消息链中的信息是我们并不需要知道的。</li>
+</ol>
+<p><strong>如何解决过度耦合的消息链这种代码坏味道？</strong></p>
+<p>可以通过 Extract Method 来提炼函数，然后 通过 Move Method 来将提炼的方法移动到合适的位置。</p>
+<p>如果读过《重构》还会提到 Hide Delegate（隐藏代理关系）的重构手法。不过不推荐使用，因为它引入多个 Middle Man 这种实现，当消息链过长的时候，这是一个有工作量且重复的工作，另外增加了很多很多耦合性的方法。</p>
+<p>因此可以有限照顾可读性，通过 Extract Method 和 Move Method 来进行重构，从而获取实现和维护性上的平衡。</p>
+<h2 id="3-代码的坏味道之c"><a href="#3-代码的坏味道之c" class="headerlink" title="3. 代码的坏味道之c++"></a>3. 代码的坏味道之c++</h2><h3 id="01-中间人（Middle-Man）"><a href="#01-中间人（Middle-Man）" class="headerlink" title="01 中间人（Middle Man）"></a>01 中间人（Middle Man）</h3><p>中间人指的是一种过度使用委托的代码，《重构》中给了一个参考值，如果一个类中有一半的方法都委托给其他对象进行，</p>
+<p><strong>为什么中间人是一种代码坏味道？</strong></p>
+<p>过度使用委托。这意味着当需求发生某些的变化的时候，这个中间人的类总是被牵连进来一并修改。这种中间人代码越多，浪费掉的时间也就越多。</p>
+<p><strong>如何解决中间人这种代码坏味道？</strong></p>
+<p>中间人的代码在于过度使用和委托两点。因此解决中间人这种代码坏味道就应该从减少委托下手：</p>
+<p>删除中间人的方法，可以使用 Remove Middle Man（移除中间人）这种重构技巧。</p>
+<p>当然如果原有代码的代理类中并不怎么变化，也可以选择延迟重构，依照“事不过三，三则重构”的原则可以选择当发生变化的时候进行重构。</p>
+<h3 id="02-狎昵关系（Inappropriate-Intimacy）"><a href="#02-狎昵关系（Inappropriate-Intimacy）" class="headerlink" title="02 狎昵关系（Inappropriate Intimacy）"></a>02 狎昵关系（Inappropriate Intimacy）</h3><p>指的是类之间花费太多的时间去探究彼此的私有的属性或者方法。</p>
+<p>造成狎昵关系的原因可能是：</p>
+<ol>
+<li>两个类本来就不应该拆分开；</li>
+<li>两个类之间存在双向关联；</li>
+<li>因为继承导致了狎昵关系；<br>…</li>
+</ol>
+<p><strong>为什么狎昵关系是一种代码坏味道？</strong></p>
+<ol>
+<li>狎昵关系会导致强耦合的表现；</li>
+<li>而且类和类之间的职责将会变得模糊；</li>
+<li>会因为访问对方的私有信息而导致过多的操作出现，或者产生封装上的妥协，让两个类纠缠不清。</li>
+</ol>
+<p><strong>如何解决狎妮关系这种代码坏味道？</strong></p>
+<ol>
+<li>通过 Move Field （搬移属性），Move Method（搬移方法）来移动属性和方法的位置，让属性和方法移动到它们本应该出现的位置。</li>
+<li>如果直接移动属性和方法并不合适，可以尝试使用 Extract Class（提炼类）看是否能够找到公共类。</li>
+<li>如果是因为相互调用导致的问题，可以尝试 Change Bidirectional Association to Unidirectional（将双向关联改为单向关联）尝试将关联关系划清。</li>
+<li>如果是因为继承导致狎昵关系，可以尝试移除继承关系，改用代理类来实现。</li>
+</ol>
+<h3 id="03-不完美的库类"><a href="#03-不完美的库类" class="headerlink" title="03 不完美的库类"></a>03 不完美的库类</h3><p>当直接使用第三方库的时候，导致代码可读性变差、意图不明确的问题。</p>
+<p><strong>为什么不完美的库类是一种代码坏味道？</strong></p>
+<p>第三方类库提供的功能能够在很场景下被复用。但是放在业务场景下，却总是要从业务视角切换到单纯的技术视角来来使用某些第三方类库。</p>
+<p>例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Date</span> <span class="variable">newStart</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Date</span>(</span><br><span class="line">                                    previousEnd.getYear(), </span><br><span class="line">                                    previousEnd.getMonth(), </span><br><span class="line">                                    previousEnd.getDate() + <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>一眼看上去这是在表达什么意思其实并不容易看到。不完美的类库就在于造成代码中语意化变差。</p>
+<p><strong>如何解决不完美库类这种代码坏味道？</strong></p>
+<p>很多开发者会采用注释的方式期望让代码可读，但是这类注释本身也是一种代码的坏味道。不过可以借助函数名来揭示意图。</p>
+<p>所以遇到上面例子的情况，可以使用 Extract Method 来提炼一个函数，生成如下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Date</span> <span class="variable">newStart</span> <span class="operator">=</span> nextDay(previousEnd);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> Date <span class="title function_">nextDay</span><span class="params">(Date previousEnd)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Date</span>(</span><br><span class="line">                            previousEnd.getYear(), </span><br><span class="line">                            previousEnd.getMonth(), </span><br><span class="line">                            previousEnd.getDate() + <span class="number">1</span>); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样调用 nextDay() 的地方，就可以轻松的知道获取到 previousEnd 日期的下一天日期。</p>
+<p>如果一个类中存在多种这种调用，或者多个类中都有类似的函数的时候，提炼一个单独一个类，并通过这个类对外提供这些方法无疑是一种消除重复提高复用的办法。实现这个类的方式可以使用代理的方式，也可以使用继承的方式。如果一个类只是提供代理方法，具体实现都要委托给类库，这样情况下，不如使用继承来生成的子类，并在子类中添加那些可以复用的方法。重构的过程可以参考 Introduce Local Extension（引入本地扩展）。</p>
+<p>很显然第三方类库被设计的出发点往往是好的，但是实际调用的时候除了享受这种快速实现的方式，还需要关注第三方类库给当前项目带来的一些坏味道，并着手解决这些问题。</p>
+<h3 id="04-拒绝的遗赠"><a href="#04-拒绝的遗赠" class="headerlink" title="04 拒绝的遗赠"></a>04 拒绝的遗赠</h3><p>这个坏味道指的是当子类继承基类的时候，父类的一些方法即使子类并不需要也被迫被继承的情况。出现这种坏味道的一般有两种原因：</p>
+<ol>
+<li>继承体系设计的不好，还需要调整；</li>
+<li>基类实现了某个接口，导致子类不需要的时候也会实现那个接口对应的方法。</li>
+</ol>
+<p>详细的例子可以参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/98756702">《重构分析21: 被拒绝的遗赠（Refused Bequest）》</a></p>
+<p><strong>为什么拒绝的遗赠是一种代码坏味道？</strong></p>
+<p>这个坏味道主要原因就是继承带来的坏味道，子类被迫实现某些方法或者从父类继承的方法对自身不但没有帮助甚至造成误导，比如：代码中通过继承实现 正方形 继承 长方形并求面积的例子，感兴趣可以参考《敏捷软件开发原则、模式、实践》中的里氏替换原则。</p>
+<p><strong>如何解决拒绝的遗赠的这种代码坏味道？</strong></p>
+<p>有两种思路：</p>
+<ol>
+<li>改善继承体系。剔除子类不需要的方法，并创建子类的兄弟，通过 Move Method 将不需要的方法移动到兄弟类中，通过 Move Field 将涉及到非公共属性也移动到兄弟子类中。</li>
+<li>使用代理来取代继承。这种方式的修改只涉及到对子类的调整，影响范围较小，并且也不会因此而像第一种重构方法那样因为要维护继承体系而导致一些新概念的产生。同时还能避免因为基类继承了某个接口，而导致的子类被迫实现某些方法的情况。</li>
+</ol>
+<h3 id="05-冗赘类（Lacy-Class）"><a href="#05-冗赘类（Lacy-Class）" class="headerlink" title="05 冗赘类（Lacy Class）"></a>05 冗赘类（Lacy Class）</h3><p>这是单一职责的一个极端表现，即拆分了很多类，每个类的职责过度单一。</p>
+<p><strong>为什么冗赘类是一种代码坏味道？</strong></p>
+<p>因为每个类都是有阅读成本低的，职责拆分的过细，意味着多个关联性强的职责也被拆分了，因此阅读代码来成本不一定提升，反而因为过分的分散而导致理解起来需要会非常费劲。</p>
+<p><strong>如何解决冗赘类这种代码坏味道？</strong></p>
+<p>这个坏味道也给开发者一个提醒，极端的追求某些原则同样会导致不必要的麻烦，因此需要通过不断的练习和思考来获取平衡的这种点。</p>
+<p>代码中一旦遇到职责过度拆分的情况就可以通过 Inline Class 或者 Collapse Hierarchy 来删除一些类，将概念合并到一个类中。</p>
+<p>当代码更多的是处理业务逻辑的时候，那么其中的类应该像领域语言靠近，尽量避免凭空制造一些概念，拆分职责的时候和业务相结合更有利于我们将代码写的简单易读。</p>
+<h3 id="06-异曲同工的类"><a href="#06-异曲同工的类" class="headerlink" title="06 异曲同工的类"></a>06 异曲同工的类</h3><p>即两个类做的同一件事或者同一类事。这种代码很常见，比如两个开发者同时执行自己的开发工作，创建了功能类似但是方法不同的类，Code Review 的时候很容易发现这种代码。</p>
+<p><strong>为什么异曲同工的类是一种代码坏味道？</strong></p>
+<p>按照上面的描述，如果保留两个职责类似的类会有什么不好？</p>
+<ol>
+<li>后续调用实现类时会导致选择上的疑虑，两个类应该选择用哪个，而疑虑之下就是时间的浪费。</li>
+<li>添加代码的时候，只向其中一个类中添加了逻辑，后续调用时 就会困扰调用者，而且容易导致两个类中容易出现重复的代码。</li>
+</ol>
+<p>异曲同工的类是后续很多坏味道的开始。</p>
+<p><strong>如何解决异曲同工的类这种代码坏味道？</strong></p>
+<ol>
+<li>一般情况，如果两个类是一般的工具类，可以选择使用Renove Method 和 Move Method 将类的职责描述清楚，并将相关的代码移动到一个类中，完成两个类的合并。</li>
+<li>如果两个类存并非普通的工具类而是存在一定的继承关系，可以采用 Extract SuperClass （提炼超类）。</li>
+</ol>
+<p>当遇到代码中的坏味道的时候，请避免延迟决策和延迟解决，因为它很可能后续导致其他的坏味道。及时个人意识到可以延迟决策但是放在团队中会可能在这个地方重复遇到问题，导致后续坏味道不断被扩散。一次一旦遇到类似的坏味道可以遵守“童子军军规”：让营地比你来的时候更干净！</p>
+<h3 id="07-纯数据类"><a href="#07-纯数据类" class="headerlink" title="07 纯数据类"></a>07 纯数据类</h3><p>纯数据类指的是：一个类中只有属性和这些属性所涉及到的 getter、setter。</p>
+<p><strong>为什么纯数据类是一种代码坏味道？</strong></p>
+<p>纯数据类有其使用场景，比如 DTO 经常这种贫血模型。但是如果结合业务到的纯数据类频繁出现，那可不是什么好的事情，因为操作这个类中属性的方法将会散落在各个类中，即存在者多处强耦合。</p>
+<p><strong>如何解决纯数据类这种代码坏味道？</strong></p>
+<p>建议使用充血模型，一个类中除了拥有属性也应该包含具有一定业务逻辑的行为。那么可以选择</p>
+<ol>
+<li>Extract Method 将部分调用逻辑进行提炼，提炼成一定的方法；</li>
+<li>再使用 Move Method 将方法移动到类中，</li>
+<li>最后 Hide Method 删除纯出局类中的 getter 和 setter。</li>
+</ol>
+<p>纯数据类有其使用场景，但是应该时刻注意到哪些场景下数据类会引入坏味道，一旦发现尽早解决。</p>
+<h3 id="08-过大的类"><a href="#08-过大的类" class="headerlink" title="08 过大的类"></a>08 过大的类</h3><p>顾名思义就是一个类做了太多的事情。SOLID 原则告诉我们类的职责应该是单一的，而一个过大类很可能意味着承担了多个/多类职责。</p>
+<p><strong>过大的类为什么是一种坏味道？</strong></p>
+<p>由于过大的类承担了过多的职责，很容易导致 重复代码 且 重复代码 不容易被发现，而这往往是坏味道的开始。</p>
+<p>如果过大的类对外提供服务发生了变动，并不容易快速响应这样的变化，可以对比一下一个小而职责单一的类中进行修改方便还是在多很多职责。</p>
+<p>当过大的类因为某个地方发生变化，很可能导致不相关的调用方的代码也会发生变化，这是一种耦合性的表现。</p>
+<p>当过大的类被继承时很可能导致其他的坏味道，例如遗留的馈赠。</p>
+<p>因此，保持小而职责单一的类将会对系统的设计有很大的帮助。当然也可以参考 Simple Design，避免过度设计的前提下保持简单的设计。</p>
+<p><strong>如何解决过大的类的代码坏味道？</strong></p>
+<ol>
+<li>观察这个过大的类的属性，看是否有关联的几个属性能够代表一定的业务意思，如果可以使用 Extract Class，将这几个属性挪动到一个新的类中，并将相关操作挪动到新的类中。循环往复，这样一个大的类能够拆分成多个小的且职责较为单一的类。</li>
+<li>观察这个大类中的方法，看是否存在兄弟关系的方法，如果有可以使用 Extract Subclass （提炼子类）的方法，将相关方法提炼到子类中，并考虑使用继承父类还是面向接口使用 Extract Interface（提炼接口）。这样相似行为的行为聚集在一个类中，拆分到多个类中，并可以进一步和方法的调用发来解耦。</li>
+<li>进一步观察剩余类的行为，如果这些行为在处理一类事情，那么可以停止了，在处理多类事情，可以按照处理逻辑的类型进一步拆分。</li>
+</ol>
+<p>简而言之，使用一个亘古不变的法则：分治法。将过大的类，拆分成多个职责单一的小类，手段是 Extract Class，Extract Subclass，Extract Interface。</p>
+<h1 id="三-其他："><a href="#三-其他：" class="headerlink" title="三. 其他："></a>三. 其他：</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if(a &gt; b)&#123;</span><br><span class="line">   return true;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">   return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<p>2、瞎命名型代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int a;</span><br><span class="line">String wzbt; // 文章标题</span><br><span class="line">String fastdi; //fast di 快递  。。中西结合...</span><br></pre></td></tr></table></figure>
+
+
+<p>以上只是不规范命名的实例的冰山一角，良好的命名除了见名知意以外，还可以在长时间以后回来阅读代码时，更快的回忆起业务逻辑，不至于在各种无解的命名中乱了手脚，为了一时的方便而随意命名是非常不值得的。</p>
+<p>3、if完一定要加else型代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">if(condition)&#123;</span><br><span class="line">   //dosm</span><br><span class="line">&#125;else&#123;</span><br><span class="line">   return ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if(condition)&#123;</span><br><span class="line">   //dosm</span><br><span class="line">&#125;else&#123;</span><br><span class="line">   throw new Exception();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">while(xx)&#123;</span><br><span class="line">    if(condition)&#123;</span><br><span class="line">            //dosm</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">            continue;    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if(!condition)&#123;</span><br><span class="line">   return ;</span><br><span class="line">&#125;</span><br><span class="line">//dosm</span><br><span class="line"></span><br><span class="line">if(!condition)&#123;</span><br><span class="line">   throw new Exception();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>文章部分转载：链接：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/141993156">https://zhuanlan.zhihu.com/p/141993156</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="http://github.com/probberechts">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%87%8D%E6%9E%84%E4%BB%A3%E7%A0%81%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">重构代码读书笔记</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E6%A6%82%E8%BF%B0"><span class="toc-number">2.</span> <span class="toc-text">一. 概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-%E5%9D%8F%E5%91%B3%E9%81%93%E8%AF%86%E5%88%AB"><span class="toc-number">3.</span> <span class="toc-text">二. 坏味道识别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%A3%E7%A0%81%E5%9D%8F%E5%91%B3%E9%81%93%E5%AF%BC%E8%87%B4%E4%BB%A3%E7%A0%81%E8%87%83%E8%82%BF%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">1. 代码坏味道导致代码臃肿：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#01-%E9%87%8D%E5%A4%8D%E4%BB%A3%E7%A0%81"><span class="toc-number">3.1.1.</span> <span class="toc-text">01 重复代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#02-%E9%95%BF%E5%87%BD%E6%95%B0"><span class="toc-number">3.1.2.</span> <span class="toc-text">02 长函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#04-%E8%BF%87%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8"><span class="toc-number">3.1.3.</span> <span class="toc-text">04 过长参数列表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#05-Switch-%E8%AF%AD%E5%8F%A5"><span class="toc-number">3.1.4.</span> <span class="toc-text">05 Switch 语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#06-%E5%A4%B8%E5%A4%B8%E5%85%B6%E8%B0%88%E7%9A%84%E6%9C%AA%E6%9D%A5%E6%80%A7"><span class="toc-number">3.1.5.</span> <span class="toc-text">06 夸夸其谈的未来性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#07-%E4%BB%A4%E4%BA%BA%E8%BF%B7%E6%83%91%E7%9A%84%E4%B8%B4%E6%97%B6%E5%AD%97%E6%AE%B5"><span class="toc-number">3.1.6.</span> <span class="toc-text">07 令人迷惑的临时字段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#08-%E8%BF%87%E5%A4%9A%E7%9A%84%E6%B3%A8%E9%87%8A"><span class="toc-number">3.1.7.</span> <span class="toc-text">08 过多的注释</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%A3%E7%A0%81%E5%9D%8F%E5%91%B3%E9%81%93%E5%AF%BC%E8%87%B4%E4%BF%AE%E6%94%B9%E6%BC%94%E8%BF%9B%E5%9B%B0%E9%9A%BE"><span class="toc-number">3.2.</span> <span class="toc-text">2. 代码坏味道导致修改演进困难</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#01-%E5%8F%91%E6%95%A3%E5%BC%8F%E5%8F%98%E5%8C%96"><span class="toc-number">3.2.1.</span> <span class="toc-text">01 发散式变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#02-%E9%9C%B0%E5%BC%B9%E5%BC%8F%E4%BF%AE%E6%94%B9"><span class="toc-number">3.2.2.</span> <span class="toc-text">02 霰弹式修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#03-%E4%BE%9D%E6%81%8B%E6%83%85%E7%BB%93"><span class="toc-number">3.2.3.</span> <span class="toc-text">03 依恋情结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#04-%E6%95%B0%E6%8D%AE%E6%B3%A5%E7%90%83"><span class="toc-number">3.2.4.</span> <span class="toc-text">04 数据泥球</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#05-%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E5%81%8F%E6%89%A7"><span class="toc-number">3.2.5.</span> <span class="toc-text">05 基本类型偏执</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#06-%E8%BF%87%E5%BA%A6%E8%80%A6%E5%90%88%E7%9A%84%E6%B6%88%E6%81%AF%E9%93%BE"><span class="toc-number">3.2.6.</span> <span class="toc-text">06 过度耦合的消息链</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BB%A3%E7%A0%81%E7%9A%84%E5%9D%8F%E5%91%B3%E9%81%93%E4%B9%8Bc"><span class="toc-number">3.3.</span> <span class="toc-text">3. 代码的坏味道之c++</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#01-%E4%B8%AD%E9%97%B4%E4%BA%BA%EF%BC%88Middle-Man%EF%BC%89"><span class="toc-number">3.3.1.</span> <span class="toc-text">01 中间人（Middle Man）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#02-%E7%8B%8E%E6%98%B5%E5%85%B3%E7%B3%BB%EF%BC%88Inappropriate-Intimacy%EF%BC%89"><span class="toc-number">3.3.2.</span> <span class="toc-text">02 狎昵关系（Inappropriate Intimacy）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#03-%E4%B8%8D%E5%AE%8C%E7%BE%8E%E7%9A%84%E5%BA%93%E7%B1%BB"><span class="toc-number">3.3.3.</span> <span class="toc-text">03 不完美的库类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#04-%E6%8B%92%E7%BB%9D%E7%9A%84%E9%81%97%E8%B5%A0"><span class="toc-number">3.3.4.</span> <span class="toc-text">04 拒绝的遗赠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#05-%E5%86%97%E8%B5%98%E7%B1%BB%EF%BC%88Lacy-Class%EF%BC%89"><span class="toc-number">3.3.5.</span> <span class="toc-text">05 冗赘类（Lacy Class）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#06-%E5%BC%82%E6%9B%B2%E5%90%8C%E5%B7%A5%E7%9A%84%E7%B1%BB"><span class="toc-number">3.3.6.</span> <span class="toc-text">06 异曲同工的类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#07-%E7%BA%AF%E6%95%B0%E6%8D%AE%E7%B1%BB"><span class="toc-number">3.3.7.</span> <span class="toc-text">07 纯数据类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#08-%E8%BF%87%E5%A4%A7%E7%9A%84%E7%B1%BB"><span class="toc-number">3.3.8.</span> <span class="toc-text">08 过大的类</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-%E5%85%B6%E4%BB%96%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">三. 其他：</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&text=重构代码读书笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&is_video=false&description=重构代码读书笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=重构代码读书笔记&body=Check out this article: http://example.com/2022/06/03/2020-06-19-read-book-refact-note/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&title=重构代码读书笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&name=重构代码读书笔记&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2022/06/03/2020-06-19-read-book-refact-note/&t=重构代码读书笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2022
+    Archer F
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

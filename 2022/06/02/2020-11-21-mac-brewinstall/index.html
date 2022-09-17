@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>ruby install script | 懒懒的</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="#!&#x2F;usr&#x2F;bin&#x2F;ruby # This script installs to &#x2F;usr&#x2F;local only. To install elsewhere (which is # unsupported) you can untar https:&#x2F;&#x2F;github.com&#x2F;Homebrew&#x2F;brew&#x2F;tarball&#x2F;master # anywhere you like. HOMEBRE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ruby install script">
+<meta property="og:url" content="http://example.com/2022/06/02/2020-11-21-mac-brewinstall/index.html">
+<meta property="og:site_name" content="懒懒的">
+<meta property="og:description" content="#!&#x2F;usr&#x2F;bin&#x2F;ruby # This script installs to &#x2F;usr&#x2F;local only. To install elsewhere (which is # unsupported) you can untar https:&#x2F;&#x2F;github.com&#x2F;Homebrew&#x2F;brew&#x2F;tarball&#x2F;master # anywhere you like. HOMEBRE">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-02T14:09:22.000Z">
+<meta property="article:modified_time" content="2022-07-29T12:58:41.948Z">
+<meta property="article:author" content="Archer F">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="懒懒的" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">懒懒的</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2020-11-21-mac-brewinstall" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/06/02/2020-11-21-mac-brewinstall/" class="article-date">
+  <time datetime="2022-06-02T14:09:22.000Z" itemprop="datePublished">2022-06-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ruby install script
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li><pre><code class="ruby">
+
+
+
+#!/usr/bin/ruby
+# This script installs to /usr/local only. To install elsewhere (which is
+# unsupported) you can untar https://github.com/Homebrew/brew/tarball/master
+# anywhere you like.
+HOMEBREW_PREFIX = &quot;/usr/local&quot;.freeze
+HOMEBREW_REPOSITORY = &quot;/usr/local/Homebrew&quot;.freeze
+HOMEBREW_CACHE = &quot;#&#123;ENV[&quot;HOME&quot;]&#125;/Library/Caches/Homebrew&quot;.freeze
+#BREW_REPO = &quot;https://github.com/Homebrew/brew&quot;.freeze
+BREW_REPO = &quot;git://mirrors.ustc.edu.cn/brew.git&quot;.freeze
+ 
+ 
+# TODO: bump version when new macOS is released
+MACOS_LATEST_SUPPORTED = &quot;10.15&quot;.freeze
+# TODO: bump version when new macOS is released
+MACOS_OLDEST_SUPPORTED = &quot;10.13&quot;.freeze
+ 
+# no analytics during installation
+ENV[&quot;HOMEBREW_NO_ANALYTICS_THIS_RUN&quot;] = &quot;1&quot;
+ENV[&quot;HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT&quot;] = &quot;1&quot;
+ 
+# get nicer global variables
+require &quot;English&quot;
+ 
+module Tty
+  module_function
+ 
+  def blue
+    bold 34
+  end
+ 
+  def red
+    bold 31
+  end
+ 
+  def reset
+    escape 0
+  end
+ 
+  def bold(code = 39)
+    escape &quot;1;#&#123;code&#125;&quot;
+  end
+ 
+  def underline
+    escape &quot;4;39&quot;
+  end
+ 
+  def escape(code)
+    &quot;\033[#&#123;code&#125;m&quot; if STDOUT.tty?
+  end
+end
+ 
+class Array
+  def shell_s
+    cp = dup
+    first = cp.shift
+    cp.map &#123; |arg| arg.gsub &quot; &quot;, &quot;\\ &quot; &#125;.unshift(first).join(&quot; &quot;)
+  end
+end
+ 
+def ohai(*args)
+  puts &quot;#&#123;Tty.blue&#125;==&gt;#&#123;Tty.bold&#125; #&#123;args.shell_s&#125;#&#123;Tty.reset&#125;&quot;
+end
+ 
+def warn(warning)
+  puts &quot;#&#123;Tty.red&#125;Warning#&#123;Tty.reset&#125;: #&#123;warning.chomp&#125;&quot;
+end
+ 
+def system(*args)
+  abort &quot;Failed during: #&#123;args.shell_s&#125;&quot; unless Kernel.system(*args)
+end
+ 
+def sudo(*args)
+  args.unshift(&quot;-A&quot;) unless ENV[&quot;SUDO_ASKPASS&quot;].nil?
+  ohai &quot;/usr/bin/sudo&quot;, *args
+  system &quot;/usr/bin/sudo&quot;, *args
+end
+ 
+def getc
+  system &quot;/bin/stty raw -echo&quot;
+  if STDIN.respond_to?(:getbyte)
+    STDIN.getbyte
+  else
+    STDIN.getc
+  end
+ensure
+  system &quot;/bin/stty -raw echo&quot;
+end
+ 
+def wait_for_user
+  puts
+  puts &quot;Press RETURN to continue or any other key to abort&quot;
+  c = getc
+  # we test for \r and \n because some stuff does \r instead
+  abort unless (c == 13) || (c == 10)
+end
+ 
+class Version
+  include Comparable
+  attr_reader :parts
+ 
+  def initialize(str)
+    @parts = str.split(&quot;.&quot;).map(&amp;:to_i)
+  end
+ 
+  def &lt;=&gt;(other)
+    parts &lt;=&gt; self.class.new(other).parts
+  end
+ 
+  def to_s
+    parts.join(&quot;.&quot;)
+  end
+end
+ 
+def macos_version
+  @macos_version ||= Version.new(`/usr/bin/sw_vers -productVersion`.chomp[/10\.\d+/])
+end
+ 
+def should_install_command_line_tools?
+  if macos_version &gt; &quot;10.13&quot;
+    !File.exist?(&quot;/Library/Developer/CommandLineTools/usr/bin/git&quot;)
+  else
+    !File.exist?(&quot;/Library/Developer/CommandLineTools/usr/bin/git&quot;) ||
+      !File.exist?(&quot;/usr/include/iconv.h&quot;)
+  end
+end
+ 
+def user_only_chmod?(path)
+  return false unless File.directory?(path)
+ 
+  mode = File.stat(path).mode &amp; 0777
+  # u = (mode &gt;&gt; 6) &amp; 07
+  # g = (mode &gt;&gt; 3) &amp; 07
+  # o = (mode &gt;&gt; 0) &amp; 07
+  mode != 0755
+end
+ 
+def chmod?(path)
+  File.exist?(path) &amp;&amp; !(File.readable?(path) &amp;&amp; File.writable?(path) &amp;&amp; File.executable?(path))
+end
+ 
+def chown?(path)
+  !File.owned?(path)
+end
+ 
+def chgrp?(path)
+  !File.grpowned?(path)
+end
+ 
+# USER isn&#39;t always set so provide a fall back for the installer and subprocesses.
+ENV[&quot;USER&quot;] ||= `id -un`.chomp
+ 
+# Invalidate sudo timestamp before exiting (if it wasn&#39;t active before).
+Kernel.system &quot;/usr/bin/sudo -n -v 2&gt;/dev/null&quot;
+at_exit &#123; Kernel.system &quot;/usr/bin/sudo&quot;, &quot;-k&quot; &#125; unless $CHILD_STATUS.success?
+ 
+# The block form of Dir.chdir fails later if Dir.CWD doesn&#39;t exist which I
+# guess is fair enough. Also sudo prints a warning message for no good reason
+Dir.chdir &quot;/usr&quot;
+ 
+####################################################################### script
+if RUBY_PLATFORM.to_s.downcase.include?(&quot;linux&quot;)
+  abort &lt;&lt;-EOABORT
+  To install Linuxbrew, paste at a terminal prompt:
+    sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)&quot;
+  EOABORT
+elsif macos_version &lt; &quot;10.7&quot;
+  abort &lt;&lt;-EOABORT
+Your Mac OS X version is too old. See:
+  #&#123;Tty.underline&#125;https://github.com/mistydemeo/tigerbrew#&#123;Tty.reset&#125;&quot;
+  EOABORT
+elsif macos_version &lt; &quot;10.9&quot;
+  abort &quot;Your OS X version is too old&quot;
+elsif Process.uid.zero?
+  abort &quot;Don&#39;t run this as root!&quot;
+elsif !`dsmemberutil checkmembership -U &quot;#&#123;ENV[&quot;USER&quot;]&#125;&quot; -G admin`.include?(&quot;user is a member&quot;)
+  abort &quot;This script requires the user #&#123;ENV[&quot;USER&quot;]&#125; to be an Administrator.&quot;
+elsif File.directory?(HOMEBREW_PREFIX) &amp;&amp; (!File.executable? HOMEBREW_PREFIX)
+  abort &lt;&lt;-EOABORT
+The Homebrew prefix, #&#123;HOMEBREW_PREFIX&#125;, exists but is not searchable. If this is
+not intentional, please restore the default permissions and try running the
+installer again:
+    sudo chmod 775 #&#123;HOMEBREW_PREFIX&#125;
+  EOABORT
+# TODO: bump version when new macOS is released
+elsif macos_version &gt; MACOS_LATEST_SUPPORTED || macos_version &lt; MACOS_OLDEST_SUPPORTED
+  who = &quot;We&quot;
+  if macos_version &gt; MACOS_LATEST_SUPPORTED
+    what = &quot;pre-release version&quot;
+  elsif macos_version &lt; MACOS_OLDEST_SUPPORTED
+    who &lt;&lt; &quot; (and Apple)&quot;
+    what = &quot;old version&quot;
+  else
+    return
+  end
+  ohai &quot;You are using macOS #&#123;macos_version.parts.join(&quot;.&quot;)&#125;.&quot;
+  ohai &quot;#&#123;who&#125; do not provide support for this #&#123;what&#125;.&quot;
+ 
+  puts &lt;&lt;-EOS
+This installation may not succeed.
+After installation, you will encounter build failures with some formulae.
+Please create pull requests instead of asking for help on Homebrew&#39;s GitHub,
+Discourse, Twitter or IRC. You are responsible for resolving any issues you
+experience while you are running this #&#123;what&#125;.
+  EOS
+end
+ 
+ohai &quot;This script will install:&quot;
+puts &quot;#&#123;HOMEBREW_PREFIX&#125;/bin/brew&quot;
+puts &quot;#&#123;HOMEBREW_PREFIX&#125;/share/doc/homebrew&quot;
+puts &quot;#&#123;HOMEBREW_PREFIX&#125;/share/man/man1/brew.1&quot;
+puts &quot;#&#123;HOMEBREW_PREFIX&#125;/share/zsh/site-functions/_brew&quot;
+puts &quot;#&#123;HOMEBREW_PREFIX&#125;/etc/bash_completion.d/brew&quot;
+puts HOMEBREW_REPOSITORY.to_s
+ 
+# Keep relatively in sync with
+# https://github.com/Homebrew/brew/blob/master/Library/Homebrew/keg.rb
+group_chmods = %w[bin etc include lib sbin share opt var
+                  Frameworks
+                  etc/bash_completion.d lib/pkgconfig
+                  share/aclocal share/doc share/info share/locale share/man
+                  share/man/man1 share/man/man2 share/man/man3 share/man/man4
+                  share/man/man5 share/man/man6 share/man/man7 share/man/man8
+                  var/log var/homebrew var/homebrew/linked
+                  bin/brew]
+               .map &#123; |d| File.join(HOMEBREW_PREFIX, d) &#125;
+               .select &#123; |d| chmod?(d) &#125;
+# zsh refuses to read from these directories if group writable
+zsh_dirs = %w[share/zsh share/zsh/site-functions]
+           .map &#123; |d| File.join(HOMEBREW_PREFIX, d) &#125;
+mkdirs = %w[bin etc include lib sbin share var opt
+            share/zsh share/zsh/site-functions
+            var/homebrew var/homebrew/linked
+            Cellar Caskroom Homebrew Frameworks]
+         .map &#123; |d| File.join(HOMEBREW_PREFIX, d) &#125;
+         .reject &#123; |d| File.directory?(d) &#125;
+ 
+user_chmods = zsh_dirs.select &#123; |d| user_only_chmod?(d) &#125;
+chmods = group_chmods + user_chmods
+chowns = chmods.select &#123; |d| chown?(d) &#125;
+chgrps = chmods.select &#123; |d| chgrp?(d) &#125;
+ 
+unless group_chmods.empty?
+  ohai &quot;The following existing directories will be made group writable:&quot;
+  puts(*group_chmods)
+end
+unless user_chmods.empty?
+  ohai &quot;The following existing directories will be made writable by user only:&quot;
+  puts(*user_chmods)
+end
+unless chowns.empty?
+  ohai &quot;The following existing directories will have their owner set to #&#123;Tty.underline&#125;#&#123;ENV[&quot;USER&quot;]&#125;#&#123;Tty.reset&#125;:&quot;
+  puts(*chowns)
+end
+unless chgrps.empty?
+  ohai &quot;The following existing directories will have their group set to #&#123;Tty.underline&#125;admin#&#123;Tty.reset&#125;:&quot;
+  puts(*chgrps)
+end
+unless mkdirs.empty?
+  ohai &quot;The following new directories will be created:&quot;
+  puts(*mkdirs)
+end
+if should_install_command_line_tools?
+  ohai &quot;The Xcode Command Line Tools will be installed.&quot;
+end
+ 
+wait_for_user if STDIN.tty? &amp;&amp; !ENV[&quot;CI&quot;]
+ 
+if File.directory? HOMEBREW_PREFIX
+  sudo &quot;/bin/chmod&quot;, &quot;u+rwx&quot;, *chmods unless chmods.empty?
+  sudo &quot;/bin/chmod&quot;, &quot;g+rwx&quot;, *group_chmods unless group_chmods.empty?
+  sudo &quot;/bin/chmod&quot;, &quot;755&quot;, *user_chmods unless user_chmods.empty?
+  sudo &quot;/usr/sbin/chown&quot;, ENV[&quot;USER&quot;], *chowns unless chowns.empty?
+  sudo &quot;/usr/bin/chgrp&quot;, &quot;admin&quot;, *chgrps unless chgrps.empty?
+else
+  sudo &quot;/bin/mkdir&quot;, &quot;-p&quot;, HOMEBREW_PREFIX
+  sudo &quot;/usr/sbin/chown&quot;, &quot;root:wheel&quot;, HOMEBREW_PREFIX
+end
+ 
+unless mkdirs.empty?
+  sudo &quot;/bin/mkdir&quot;, &quot;-p&quot;, *mkdirs
+  sudo &quot;/bin/chmod&quot;, &quot;g+rwx&quot;, *mkdirs
+  sudo &quot;/bin/chmod&quot;, &quot;755&quot;, *zsh_dirs
+  sudo &quot;/usr/sbin/chown&quot;, ENV[&quot;USER&quot;], *mkdirs
+  sudo &quot;/usr/bin/chgrp&quot;, &quot;admin&quot;, *mkdirs
+end
+ 
+sudo &quot;/bin/mkdir&quot;, &quot;-p&quot;, HOMEBREW_CACHE unless File.directory? HOMEBREW_CACHE
+sudo &quot;/bin/chmod&quot;, &quot;g+rwx&quot;, HOMEBREW_CACHE if chmod? HOMEBREW_CACHE
+sudo &quot;/usr/sbin/chown&quot;, ENV[&quot;USER&quot;], HOMEBREW_CACHE if chown? HOMEBREW_CACHE
+sudo &quot;/usr/bin/chgrp&quot;, &quot;admin&quot;, HOMEBREW_CACHE if chgrp? HOMEBREW_CACHE
+system &quot;/usr/bin/touch&quot;, &quot;#&#123;HOMEBREW_CACHE&#125;/.cleaned&quot; if File.directory? HOMEBREW_CACHE
+ 
+if should_install_command_line_tools? &amp;&amp; macos_version &gt;= &quot;10.13&quot;
+  ohai &quot;Searching online for the Command Line Tools&quot;
+  # This temporary file prompts the &#39;softwareupdate&#39; utility to list the Command Line Tools
+  clt_placeholder = &quot;/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress&quot;
+  sudo &quot;/usr/bin/touch&quot;, clt_placeholder
+ 
+  clt_label_command = &quot;/usr/sbin/softwareupdate -l | &quot; \
+                      &quot;grep -B 1 -E &#39;Command Line Tools&#39; | &quot; \
+                      &quot;awk -F&#39;*&#39; &#39;/^ *\\*/ &#123;print $2&#125;&#39; | &quot; \
+                      &quot;sed -e &#39;s/^ *Label: //&#39; -e &#39;s/^ *//&#39; | &quot; \
+                      &quot;sort -V | &quot; \
+                      &quot;tail -n1&quot;
+  clt_label = `#&#123;clt_label_command&#125;`.chomp
+ 
+  unless clt_label.empty?
+    ohai &quot;Installing #&#123;clt_label&#125;&quot;
+    sudo &quot;/usr/sbin/softwareupdate&quot;, &quot;-i&quot;, clt_label
+    sudo &quot;/bin/rm&quot;, &quot;-f&quot;, clt_placeholder
+    sudo &quot;/usr/bin/xcode-select&quot;, &quot;--switch&quot;, &quot;/Library/Developer/CommandLineTools&quot;
+  end
+end
+ 
+# Headless install may have failed, so fallback to original &#39;xcode-select&#39; method
+if should_install_command_line_tools? &amp;&amp; STDIN.tty?
+  ohai &quot;Installing the Command Line Tools (expect a GUI popup):&quot;
+  sudo &quot;/usr/bin/xcode-select&quot;, &quot;--install&quot;
+  puts &quot;Press any key when the installation has completed.&quot;
+  getc
+  sudo &quot;/usr/bin/xcode-select&quot;, &quot;--switch&quot;, &quot;/Library/Developer/CommandLineTools&quot;
+end
+ 
+abort &lt;&lt;-EOABORT if `/usr/bin/xcrun clang 2&gt;&amp;1` =~ /license/ &amp;&amp; !$CHILD_STATUS.success?
+You have not agreed to the Xcode license.
+Before running the installer again please agree to the license by opening
+Xcode.app or running:
+    sudo xcodebuild -license
+EOABORT
+ 
+ohai &quot;Downloading and installing Homebrew...&quot;
+Dir.chdir HOMEBREW_REPOSITORY do
+  # we do it in four steps to avoid merge errors when reinstalling
+  system &quot;git&quot;, &quot;init&quot;, &quot;-q&quot;
+ 
+  # &quot;git remote add&quot; will fail if the remote is defined in the global config
+  system &quot;git&quot;, &quot;config&quot;, &quot;remote.origin.url&quot;, BREW_REPO
+  system &quot;git&quot;, &quot;config&quot;, &quot;remote.origin.fetch&quot;, &quot;+refs/heads/*:refs/remotes/origin/*&quot;
+ 
+  # ensure we don&#39;t munge line endings on checkout
+  system &quot;git&quot;, &quot;config&quot;, &quot;core.autocrlf&quot;, &quot;false&quot;
+ 
+  system &quot;git&quot;, &quot;fetch&quot;, &quot;origin&quot;, &quot;master:refs/remotes/origin/master&quot;,
+         &quot;--tags&quot;, &quot;--force&quot;
+ 
+  system &quot;git&quot;, &quot;reset&quot;, &quot;--hard&quot;, &quot;origin/master&quot;
+ 
+  system &quot;ln&quot;, &quot;-sf&quot;, &quot;#&#123;HOMEBREW_REPOSITORY&#125;/bin/brew&quot;, &quot;#&#123;HOMEBREW_PREFIX&#125;/bin/brew&quot;
+ 
+  system &quot;#&#123;HOMEBREW_PREFIX&#125;/bin/brew&quot;, &quot;update&quot;, &quot;--force&quot;
+end
+ 
+warn &quot;#&#123;HOMEBREW_PREFIX&#125;/bin is not in your PATH.&quot; unless ENV[&quot;PATH&quot;].split(&quot;:&quot;).include? &quot;#&#123;HOMEBREW_PREFIX&#125;/bin&quot;
+ 
+ohai &quot;Installation successful!&quot;
+puts
+ 
+# Use the shell&#39;s audible bell.
+print &quot;\a&quot;
+ 
+# Use an extra newline and bold to avoid this being missed.
+ohai &quot;Homebrew has enabled anonymous aggregate formulae and cask analytics.&quot;
+puts &lt;&lt;-EOS
+#&#123;Tty.bold&#125;Read the analytics documentation (and how to opt-out) here:
+  #&#123;Tty.underline&#125;https://docs.brew.sh/Analytics#&#123;Tty.reset&#125;
+ 
+EOS
+ 
+ohai &quot;Homebrew is run entirely by unpaid volunteers. Please consider donating:&quot;
+puts &lt;&lt;-EOS
+  #&#123;Tty.underline&#125;https://github.com/Homebrew/brew#donations#&#123;Tty.reset&#125;
+EOS
+ 
+Dir.chdir HOMEBREW_REPOSITORY do
+  system &quot;git&quot;, &quot;config&quot;, &quot;--local&quot;, &quot;--replace-all&quot;, &quot;homebrew.analyticsmessage&quot;, &quot;true&quot;
+  system &quot;git&quot;, &quot;config&quot;, &quot;--local&quot;, &quot;--replace-all&quot;, &quot;homebrew.caskanalyticsmessage&quot;, &quot;true&quot;
+end
+ 
+ohai &quot;Next steps:&quot;
+puts &quot;- Run `brew help` to get started&quot;
+puts &quot;- Further documentation: &quot;
+puts &quot;    #&#123;Tty.underline&#125;https://docs.brew.sh#&#123;Tty.reset&#125;&quot;
+</code></pre>
+</li>
+</ol>
+<ol>
+<li>cd “$(brew –repo)”</li>
+<li>git remote set-url origin <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/homebrew/brew.git">https://mirrors.aliyun.com/homebrew/brew.git</a></li>
+<li><em># 替换homebrew-core.git</em></li>
+<li>cd “$(brew –repo)/Library/Taps/homebrew/homebrew-core”</li>
+<li>git remote set-url origin <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/homebrew/homebrew-core.git">https://mirrors.aliyun.com/homebrew/homebrew-core.git</a></li>
+<li><em># 刷新源</em></li>
+<li>brew update</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2022/06/02/2020-11-21-mac-brewinstall/" data-id="cl85s4b160010907w10y48ih4" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2022/06/02/2020-11-21-leetcode-bingchaji/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          并查集模版
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2022/06/02/hello-world-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">hello world</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ALG/">ALG</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mac/">Mac</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/book/">book</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/coding/">coding</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tools/">tools</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS-ALG-jekyll/" rel="tag">DFS, ALG, jekyll</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coding/" rel="tag">coding</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hackintosh/" rel="tag">hackintosh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/" rel="tag">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/refact/" rel="tag">refact</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby-github-jekyll/" rel="tag">ruby, github, jekyll</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby-github-jekyll-404/" rel="tag">ruby, github, jekyll,404</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/DFS-ALG-jekyll/" style="font-size: 10px;">DFS, ALG, jekyll</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/coding/" style="font-size: 15px;">coding</a> <a href="/tags/hackintosh/" style="font-size: 15px;">hackintosh</a> <a href="/tags/leetcode/" style="font-size: 20px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/refact/" style="font-size: 10px;">refact</a> <a href="/tags/ruby-github-jekyll/" style="font-size: 10px;">ruby, github, jekyll</a> <a href="/tags/ruby-github-jekyll-404/" style="font-size: 10px;">ruby, github, jekyll,404</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">September 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">July 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/09/09/%E8%99%9A%E5%87%BD%E6%95%B0/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/29/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/29/2020-02-11-Mac-Brew-Install/">Homebrew (un)installer</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/29/2020-06-19-read-book-refact-note/">重构代码读书笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2022/07/29/2020-11-21-leetcode-bfs/">BFS模版</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 Archer F<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
